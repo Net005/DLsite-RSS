@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>DLsite RSS · Control Panel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23e60026'/%3E%3Cpath d='M9 22a2 2 0 1 0 0 .01M9 15a8 8 0 0 1 8 8M9 9a14 14 0 0 1 14 14' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#dashboard">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="18" r="2.4" fill="#fff"/><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></span>
+      <span class="brand-text">DLsite <b>RSS</b></span>
+      <span class="r18">R18</span>
+    </a>
+    <div class="conn" id="conn" title="Live connection"><i></i><span>connecting…</span></div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <a href="#dashboard" data-tab="dashboard">Dashboard</a>
+    <a href="#ranking" data-tab="ranking">Ranking <em id="tabCount">0</em></a>
+    <a href="#log" data-tab="log">Live Log</a>
+    <a href="#history" data-tab="history">History</a>
+    <a href="#settings" data-tab="settings">Settings</a>
+  </nav>
+</header>
+
+<main>
+<!-- ============ DASHBOARD ============ -->
+<section id="tab-dashboard" class="tab">
+  <div class="statbar">
+    <div class="stat"><label>Tracked games</label><b id="sTotal">–</b><small id="sTotalSub">&nbsp;</small></div>
+    <div class="stat accent"><label>New in feed</label><b id="sNew">–</b><small id="sNewSub">&nbsp;</small></div>
+    <div class="stat"><label>Last scrape</label><b id="sLast">–</b><small id="sLastSub">&nbsp;</small></div>
+    <div class="stat"><label>Next scrape</label><b id="sNext">–</b><small id="sNextSub">&nbsp;</small></div>
+  </div>
+
+  <div class="panel runpanel">
+    <div class="runinfo">
+      <div class="runstate"><span class="dot" id="runDot"></span><b id="runPhase">Idle</b><span id="runMeta" class="muted"></span></div>
+      <div class="bar" id="runBar"><i></i></div>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="btnRun">▶ Scrape now</button>
+      <button class="btn" id="btnCancel" hidden>■ Cancel</button>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-h"><h2>Newest arrivals</h2><a href="#ranking" class="link">All games →</a></div>
+      <div id="newList" class="minilist"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><h2>Live log</h2><a href="#log" class="link">Full log →</a></div>
+      <div class="console mini" id="miniLog"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><h2>RSS feed</h2></div>
+    <div class="feedrow">
+      <input id="feedUrl" readonly>
+      <button class="btn" id="btnCopy">Copy</button>
+      <a class="btn" id="btnOpenFeed" target="_blank" rel="noopener">Open ↗</a>
+    </div>
+    <p class="muted small" id="feedHint"></p>
+  </div>
+</section>
+
+<!-- ============ RANKING ============ -->
+<section id="tab-ranking" class="tab" hidden>
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="Search title, circle or product ID…">
+    <select id="fFilter">
+      <option value="all">All tracked</option>
+      <option value="feed">In feed (new)</option>
+      <option value="active">Currently ranked</option>
+      <option value="dropped">Dropped out</option>
+      <option value="hidden">Hidden from feed</option>
+    </select>
+    <select id="fSort">
+      <option value="rank">Sort: rank</option>
+      <option value="newest">Sort: newest first</option>
+      <option value="climb">Sort: biggest climb</option>
+      <option value="title">Sort: title</option>
+    </select>
+    <select id="fCat"><option value="">All types</option></select>
+    <div class="seg"><button id="vGrid" class="on" title="Grid">▦</button><button id="vList" title="List">☰</button></div>
+    <span class="muted small" id="resultCount"></span>
+  </div>
+  <div id="items" class="cards"></div>
+  <div id="empty" class="empty" hidden>No games match. Run a scrape or relax the filters.</div>
+</section>
+
+<!-- ============ LOG ============ -->
+<section id="tab-log" class="tab" hidden>
+  <div class="toolbar">
+    <input id="logQ" type="search" placeholder="Filter log…">
+    <select id="logLevel"><option value="">All levels</option><option value="warn">Warnings+</option><option value="error">Errors</option></select>
+    <label class="chk"><input type="checkbox" id="logFollow" checked> Auto-scroll</label>
+    <button class="btn" id="logPause">Pause</button>
+    <button class="btn" id="logDl">Download</button>
+    <button class="btn danger" id="logClear">Clear</button>
+  </div>
+  <div class="console full" id="fullLog"></div>
+</section>
+
+<!-- ============ HISTORY ============ -->
+<section id="tab-history" class="tab" hidden>
+  <div class="panel">
+    <div class="panel-h"><h2>Scrape history</h2><button class="btn small danger" id="btnClearRuns">Clear</button></div>
+    <div class="tablewrap"><table id="runsTable">
+      <thead><tr><th>#</th><th>Started</th><th>Trigger</th><th>Source</th><th>Status</th><th class="r">Found</th><th class="r">New</th><th class="r">Took</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ SETTINGS ============ -->
+<section id="tab-settings" class="tab" hidden>
+  <form id="settingsForm" class="panel form" autocomplete="off">
+    <div class="panel-h"><h2>Scraping</h2></div>
+    <div class="fields">
+      <label class="switch span2"><input type="checkbox" name="auto_scrape"><span>Automatic scheduled scraping</span></label>
+      <label>Interval (hours)<input type="number" name="interval_hours" min="0.25" step="0.25"></label>
+      <label>Games to collect<input type="number" name="target_games" min="1" max="500"></label>
+      <label>Max pages<input type="number" name="max_pages" min="1" max="20"></label>
+      <label>Delay between pages (s)<input type="number" name="page_delay_sec" min="0" max="60"></label>
+      <label>Source mode
+        <select name="mode"><option value="auto">Auto (browser, fall back to HTTP)</option><option value="browser">Browser only (Chromium)</option><option value="http">HTTP only (top ~30)</option></select></label>
+      <label>Ranking period
+        <select name="term"><option value="month">Monthly (30 days)</option><option value="week">Weekly (7 days)</option><option value="day">Daily (24 h)</option></select></label>
+      <label>Category
+        <select name="category"><option value="game">Game / Video</option><option value="comic">Manga / CG</option><option value="voice">Voice / ASMR / Music</option></select></label>
+      <label>Locale<input name="locale" placeholder="en_US"></label>
+      <label class="switch span2"><input type="checkbox" name="games_only"><span>Drop rows whose work type doesn't match the category</span></label>
+    </div>
+    <div class="panel-h"><h2>Feed</h2></div>
+    <div class="fields">
+      <label>New-item window (days)<input type="number" name="new_items_days" min="1" max="365"></label>
+      <label>Feed title<input name="feed_title"></label>
+      <label class="span2">Public base URL <small>(used in the feed's self-link, e.g. https://rss.example.com)</small><input name="public_url" placeholder="auto-detect"></label>
+    </div>
+    <div class="panel-h"><h2>Notifications</h2></div>
+    <div class="fields">
+      <label class="span2">Discord-compatible webhook URL <small>(posted when new games appear)</small><input name="webhook_url" placeholder="https://discord.com/api/webhooks/…"></label>
+    </div>
+    <div class="formbtns">
+      <button type="submit" class="btn primary">Save settings</button>
+      <button type="button" class="btn" id="btnWebhook">Send test message</button>
+      <span id="saveMsg" class="muted small"></span>
+    </div>
+  </form>
+
+  <div class="panel">
+    <div class="panel-h"><h2>Data</h2></div>
+    <p class="muted small">State is a single JSON file, compatible with the old Python <code>dlsite_seen_titles.json</code>. Import replaces everything currently tracked.</p>
+    <div class="formbtns">
+      <a class="btn" href="/api/export">⬇ Export state</a>
+      <label class="btn filebtn">⬆ Import state<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      <button class="btn danger" id="btnClearState">Clear all tracked games</button>
+    </div>
+    <p class="muted small" id="aboutLine"></p>
+  </div>
+</section>
+</main>
+
+<div id="toasts"></div>
+<script src="app.js"></script>
+</body>
+</html>

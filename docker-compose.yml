@@ -1,0 +1,19 @@
+services:
+  dlsite-rss:
+    image: ghcr.io/net005/dlsite-rss:latest
+    # build: .            # uncomment to build locally instead of pulling from GHCR
+    container_name: dlsite-rss
+    restart: unless-stopped
+    ports:
+      - "6050:6050"
+    environment:
+      TZ: Europe/Amsterdam
+      ADMIN_USER: admin
+      ADMIN_PASS: change-me          # protects the control panel; /feed.xml and /health stay public
+      # PUBLIC_URL: https://rss.example.com
+      # WEBHOOK_URL: https://discord.com/api/webhooks/...
+    volumes:
+      - ./data:/data                  # state, settings, history and log live here
+    shm_size: "512m"                  # Chromium needs more than Docker's default 64 MB
+    security_opt:
+      - seccomp=unconfined            # lets Chromium use its own sandbox-less renderer; remove if you use a custom seccomp profile

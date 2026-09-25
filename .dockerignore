@@ -1,0 +1,5 @@
+data
+.git
+*.md
+*.log
+dlsite_flask_rss*.py
