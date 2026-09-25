@@ -3,3 +3,6 @@
 /dlsite-rss
 /dlsite-rss.exe
 .env
+*.tar.gz
+_to_delete/
+.nfs*

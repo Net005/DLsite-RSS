@@ -7,7 +7,7 @@ A single Go binary that scrapes the **DLsite Maniax (R18) monthly game ranking**
 - **Live Log** – streamed over SSE, filter by text/level, pause, download
 - **History** – every scrape with source, result, counts and duration
 - **Settings** – interval, window, target count, source mode, period/category/locale, feed title/URL, Discord-compatible webhook for new games; state export/import
-- Optional HTTP basic auth for the panel (`ADMIN_PASS`); `/feed.xml` and `/health` stay public
+- Form login with signed session cookies (set `ADMIN_USER` / `ADMIN_PASS`; 5 wrong attempts lock an IP for 5 min; "keep me signed in" = 30 days); `/feed.xml` and `/health` stay public with no auth
 
 ## Quick start (Docker Compose)
 
@@ -33,7 +33,7 @@ Drop your existing `dlsite_seen_titles.json` into `./data/` before the first sta
 |---|---|---|
 | `PORT` / `HOST` | `6050` / `0.0.0.0` | listen address |
 | `DATA_DIR` | `./data` (`/data` in Docker) | state, settings, history, log |
-| `ADMIN_USER` / `ADMIN_PASS` | `admin` / *(unset = open)* | basic auth for the panel and API |
+| `ADMIN_USER` / `ADMIN_PASS` | `admin` / *(unset = open)* | login for the panel and API (unset = no login) |
 | `PUBLIC_URL` | auto | base URL used in the feed's self link |
 | `WEBHOOK_URL` | – | Discord-compatible webhook for new games |
 | `SCRAPE_MODE` | – | override `auto` / `browser` / `http` |

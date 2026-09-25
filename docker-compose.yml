@@ -9,7 +9,7 @@ services:
     environment:
       TZ: Europe/Amsterdam
       ADMIN_USER: admin
-      ADMIN_PASS: change-me          # protects the control panel; /feed.xml and /health stay public
+      ADMIN_PASS: change-me          # login password for the panel; /feed.xml and /health stay public
       # PUBLIC_URL: https://rss.example.com
       # WEBHOOK_URL: https://discord.com/api/webhooks/...
     volumes:

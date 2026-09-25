@@ -77,8 +77,8 @@ func main() {
 	} else {
 		hub.Warn("Chromium not found — only HTTP mode (top ~30) will work.")
 	}
-	app := &App{cfg: cfg, store: st, hub: hub, runner: runner, user: env("ADMIN_USER", "admin"), pass: os.Getenv("ADMIN_PASS")}
-	if app.pass == "" {
+	app := &App{cfg: cfg, store: st, hub: hub, runner: runner, auth: NewAuth(env("ADMIN_USER", "admin"), os.Getenv("ADMIN_PASS"), dataDir, hub)}
+	if !app.auth.Enabled() {
 		hub.Warn("ADMIN_PASS is not set — the control panel is open to anyone who can reach this port.")
 	}
 

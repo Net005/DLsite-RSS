@@ -154,3 +154,16 @@ td.r,th.r{text-align:right}
   .cards.list .circ,.cards.list .meta{display:none}.cards{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 }
 [hidden]{display:none!important}
+
+.topright{display:flex;align-items:center;gap:14px}
+/* login page */
+.loginwrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg)}
+.logincard{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--red);border-radius:12px;box-shadow:var(--shadow);padding:28px 28px 24px}
+.logincard .brand{justify-content:center;margin-bottom:6px}
+.logincard p.sub{text-align:center;color:var(--muted);margin:0 0 22px;font-size:13px}
+.logincard label{display:flex;flex-direction:column;gap:5px;font-weight:600;color:var(--ink);font-size:13px;margin-bottom:14px}
+.logincard input[type=text],.logincard input[type=password]{padding:10px 12px;font-size:15px}
+.logincard .row{display:flex;align-items:center;gap:8px;margin:2px 0 18px;font-size:13px}
+.logincard .row input{accent-color:var(--red);width:16px;height:16px}
+.logincard .btn.primary{width:100%;justify-content:center;padding:11px;font-size:15px}
+.loginerr{background:var(--redbg);color:var(--red);border-radius:7px;padding:9px 12px;font-size:13px;margin-bottom:14px}

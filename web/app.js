@@ -9,6 +9,7 @@ try { S.view = localStorage.getItem('view') || 'grid'; } catch (e) {}
 async function api(path, opts = {}) {
   const r = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
   let data = null; try { data = await r.json(); } catch (e) {}
+  if (r.status === 401) { location.href = '/login'; throw new Error('Session expired'); }
   if (!r.ok) throw new Error((data && data.error) || r.statusText);
   return data;
 }
@@ -231,5 +232,8 @@ function connect() {
     S.status = await api('/api/status'); renderStatus();
   } catch (e) { toast(e.message, true); }
   await loadItems(); connect();
+  fetch('/api/auth').then(r => r.json()).then(a => { $('#btnLogout').hidden = !a.enabled; }).catch(() => {});
   setInterval(() => api('/api/status').then(s => { S.status = s; renderStatus(); }).catch(() => {}), 30000);
 })();
+
+$('#btnLogout').onclick = async () => { await fetch('/api/logout', { method: 'POST' }); location.href = '/login'; };

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,8 +14,7 @@ type App struct {
 	store  *Store
 	hub    *Hub
 	runner *Runner
-	user   string
-	pass   string
+	auth   *Auth
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -27,23 +25,6 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 
 func apiErr(w http.ResponseWriter, code int, msg string) {
 	writeJSON(w, code, map[string]string{"error": msg})
-}
-
-// auth protects everything except the public feed and health check.
-func (a *App) auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if a.pass == "" || r.URL.Path == "/feed.xml" || r.URL.Path == "/health" {
-			next.ServeHTTP(w, r)
-			return
-		}
-		u, p, ok := r.BasicAuth()
-		if !ok || subtle.ConstantTimeCompare([]byte(u), []byte(a.user)) != 1 || subtle.ConstantTimeCompare([]byte(p), []byte(a.pass)) != 1 {
-			w.Header().Set("WWW-Authenticate", `Basic realm="DLsite RSS"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
 }
 
 // ItemView is an Item plus computed display fields.
@@ -90,6 +71,12 @@ func (a *App) handleItems(w http.ResponseWriter, r *http.Request) {
 func (a *App) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /feed.xml", a.handleFeed)
+	mux.HandleFunc("GET /login", a.auth.handleLogin)
+	mux.HandleFunc("POST /login", a.auth.handleLogin)
+	mux.HandleFunc("GET /api/auth", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, 200, map[string]bool{"enabled": a.auth.Enabled()})
+	})
+	mux.HandleFunc("POST /api/logout", a.auth.handleLogout)
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("OK")) })
 
 	mux.HandleFunc("GET /api/status", func(w http.ResponseWriter, r *http.Request) { writeJSON(w, 200, a.runner.Status()) })
@@ -206,7 +193,7 @@ func (a *App) routes() http.Handler {
 	})
 
 	mux.Handle("GET /", http.FileServerFS(webFS()))
-	return a.auth(mux)
+	return a.auth.Middleware(mux)
 }
 
 // handleEvents streams log lines, status and item-change notifications (SSE).
