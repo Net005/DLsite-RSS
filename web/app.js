@@ -1,6 +1,7 @@
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const setText = (el, t) => { if (el.textContent !== String(t)) el.textContent = t; };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const S = { status: null, items: [], settings: null, logs: [], lastLogId: 0, paused: false, pending: [], view: 'grid' };
@@ -49,27 +50,27 @@ addEventListener('hashchange', showTab);
 /* ---------- status ---------- */
 function renderStatus() {
   const st = S.status; if (!st) return;
-  $('#sTotal').textContent = st.total; $('#tabCount').textContent = st.total;
-  $('#sTotalSub').textContent = st.chrome_available ? 'browser scraping available' : 'HTTP mode only';
-  $('#sNew').textContent = st.new_in_feed;
-  $('#sNewSub').textContent = `first seen within ${S.settings ? S.settings.new_items_days : 7} days`;
+  setText($('#sTotal'), st.total); setText($('#tabCount'), st.total);
+  setText($('#sTotalSub'), st.chrome_available ? 'browser scraping available' : 'HTTP mode only');
+  setText($('#sNew'), st.new_in_feed);
+  setText($('#sNewSub'), `first seen within ${S.settings ? S.settings.new_items_days : 7} days`);
   const lr = st.last_run;
-  $('#sLast').textContent = lr ? ago(lr.started) : 'never';
-  $('#sLastSub').textContent = lr ? `${lr.status} · ${lr.found} found · ${lr.new} new` : 'no scrape yet';
-  $('#sNext').textContent = st.running ? 'running…' : st.auto_scrape ? until(st.next_run) : 'off';
-  $('#sNextSub').textContent = st.auto_scrape ? `every ${st.interval_hours} h` : 'auto-scrape disabled';
+  setText($('#sLast'), lr ? ago(lr.started) : 'never');
+  setText($('#sLastSub'), lr ? `${lr.status} · ${lr.found} found · ${lr.new} new` : 'no scrape yet');
+  setText($('#sNext'), st.running ? 'running…' : st.auto_scrape ? until(st.next_run) : 'off');
+  setText($('#sNextSub'), st.auto_scrape ? `every ${st.interval_hours} h` : 'auto-scrape disabled');
   const dot = $('#runDot'), bar = $('#runBar');
   dot.classList.toggle('run', st.running);
-  $('#runPhase').textContent = st.running ? 'Scraping — ' + st.phase : 'Idle';
-  $('#runMeta').textContent = st.running ? (st.progress ? `${st.progress} games collected · started by ${st.trigger}` : `started by ${st.trigger}`)
-    : lr ? `last run ${lr.status} ${ago(lr.started)}${lr.error ? ' — ' + lr.error : ''}` : 'waiting for the first scrape';
+  setText($('#runPhase'), st.running ? 'Scraping — ' + st.phase : 'Idle');
+  setText($('#runMeta'), st.running ? (st.progress ? `${st.progress} games collected · started by ${st.trigger}` : `started by ${st.trigger}`)
+    : lr ? `last run ${lr.status} ${ago(lr.started)}${lr.error ? ' — ' + lr.error : ''}` : 'waiting for the first scrape');
   bar.classList.toggle('indet', st.running && !st.progress);
   const target = S.settings ? S.settings.target_games : 100;
   bar.firstElementChild.style.width = st.running && st.progress ? Math.min(100, st.progress / target * 100) + '%' : (st.running ? '' : '0');
   $('#btnRun').disabled = st.running; $('#btnCancel').hidden = !st.running;
-  $('#aboutLine').textContent = `Version ${st.version} · uptime ${Math.floor(st.uptime_sec / 60)} min`;
+  setText($('#aboutLine'), `Version ${st.version} · uptime ${Math.floor(st.uptime_sec / 60)} min`);
 }
-setInterval(() => { if (S.status) { const st = S.status; $('#sNext').textContent = st.running ? 'running…' : st.auto_scrape ? until(st.next_run) : 'off'; if (st.last_run) $('#sLast').textContent = ago(st.last_run.started); } }, 1000);
+setInterval(() => { if (S.status && !document.hidden) { const st = S.status; setText($('#sNext'), st.running ? 'running…' : st.auto_scrape ? until(st.next_run) : 'off'); if (st.last_run) setText($('#sLast'), ago(st.last_run.started)); } }, 1000);
 
 /* ---------- items ---------- */
 function rankDelta(it) {
@@ -125,8 +126,14 @@ function renderItems() {
 async function loadItems() { try { S.items = await api('/api/items'); renderItems(); } catch (e) { toast(e.message, true); } }
 
 $('#items').addEventListener('click', async e => {
-  const b = e.target.closest('button[data-act]'); if (!b) return;
-  const it = S.items.find(i => i.product_id === b.closest('.card').dataset.pid); if (!it) return;
+  const cardEl = e.target.closest('.card'); if (!cardEl) return;
+  const b = e.target.closest('button[data-act]');
+  if (!b) { // click anywhere on the card (except links/buttons) opens the game on DLsite
+    if (e.target.closest('a')) return;
+    const g = S.items.find(i => i.product_id === cardEl.dataset.pid); if (g) window.open(g.url, '_blank', 'noopener');
+    return;
+  }
+  const it = S.items.find(i => i.product_id === cardEl.dataset.pid); if (!it) return;
   try {
     if (b.dataset.act === 'open') window.open(it.url, '_blank', 'noopener');
     if (b.dataset.act === 'hide') { await api(`/api/items/${it.product_id}/hide?hidden=${!it.hidden}`, { method: 'POST' }); toast(it.hidden ? 'Restored to feed' : 'Hidden from feed'); }

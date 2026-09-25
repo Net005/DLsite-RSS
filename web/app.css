@@ -80,6 +80,7 @@ input:focus,select:focus{outline:2px solid rgba(230,0,38,.25);border-color:var(-
 /* ranking cards — modelled on DLsite's ranking tiles */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:9px;overflow:hidden;position:relative;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .12s,border-color .12s}
+.card{cursor:pointer}
 .card:hover{transform:translateY(-2px);border-color:var(--line2)}
 .card.dim{opacity:.55}
 .thumb{position:relative;aspect-ratio:4/3;background:var(--bg);overflow:hidden}
@@ -97,8 +98,8 @@ input:focus,select:focus{outline:2px solid rgba(230,0,38,.25);border-color:var(-
 .delta{font-weight:700;font-size:12px}.delta.up{color:var(--green)}.delta.down{color:var(--red)}.delta.same{color:var(--muted)}.delta.new{color:var(--red)}
 .acts{position:absolute;top:34px;right:6px;display:flex;flex-direction:column;gap:4px;opacity:0;transition:opacity .12s}
 .card:hover .acts{opacity:1}
-.acts button{width:26px;height:26px;border:0;border-radius:6px;background:rgba(255,255,255,.94);color:var(--ink);cursor:pointer;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-.acts button:hover{background:var(--red);color:#fff}
+.acts button{width:28px;height:28px;border:1px solid rgba(255,255,255,.35);border-radius:6px;background:rgba(20,24,38,.82);color:#fff;cursor:pointer;font-size:13px;line-height:1;display:grid;place-items:center;backdrop-filter:blur(3px);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.acts button:hover{background:var(--red);border-color:var(--red);color:#fff}
 .cards.list{grid-template-columns:1fr;gap:8px}
 .cards.list .card{flex-direction:row;align-items:center}
 .cards.list .thumb{width:130px;aspect-ratio:4/3;flex:none}
@@ -106,7 +107,8 @@ input:focus,select:focus{outline:2px solid rgba(230,0,38,.25);border-color:var(-
 .cards.list .ttl{flex:1;min-height:0;-webkit-line-clamp:2}
 .cards.list .circ{width:180px}.cards.list .meta{margin:0;padding:0;gap:14px;width:230px;justify-content:flex-end}
 .cards.list .acts{position:static;flex-direction:row;opacity:1;padding-right:10px}
-.cards.list .acts button{box-shadow:none;border:1px solid var(--line)}
+.cards.list .acts button{box-shadow:none;background:var(--bg);color:var(--ink);border:1px solid var(--line2)}
+.cards.list .acts button:hover{background:var(--red);color:#fff;border-color:var(--red)}
 .empty{text-align:center;color:var(--muted);padding:50px 0}
 
 /* mini list */
