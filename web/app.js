@@ -20,12 +20,13 @@ function toast(msg, err) {
 }
 
 /* ---------- time helpers ---------- */
-function ago(iso) {
-  if (!iso) return '–';
-  const s = Math.max(0, (Date.now() - new Date(iso)) / 1000);
-  if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago';
-  if (s < 86400) return Math.floor(s / 3600) + ' h ago'; return Math.floor(s / 86400) + ' d ago';
+// Compact, language-neutral durations ("5h 12m") so nothing here can be mistranslated.
+function span(s) {
+  s = Math.max(0, Math.floor(s));
+  const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+  if (d) return `${d}d ${h}h`; if (h) return `${h}h ${m}m`; if (m) return `${m}m`; return '<1m';
 }
+function ago(iso) { return iso ? span((Date.now() - new Date(iso)) / 1000) : '–'; }
 function until(iso) {
   if (!iso) return '–';
   let s = Math.round((new Date(iso) - Date.now()) / 1000); if (s <= 0) return 'any moment';
@@ -55,15 +56,15 @@ function renderStatus() {
   setText($('#sNew'), st.new_in_feed);
   setText($('#sNewSub'), `first seen within ${S.settings ? S.settings.new_items_days : 7} days`);
   const lr = st.last_run;
-  setText($('#sLast'), lr ? ago(lr.started) : 'never');
-  setText($('#sLastSub'), lr ? `${lr.status} · ${lr.found} found · ${lr.new} new` : 'no scrape yet');
+  setText($('#sLast'), lr ? ago(lr.started) : '–');
+  setText($('#sLastSub'), lr ? `${lr.status} · ${lr.found} found · ${lr.new} new · ${new Date(lr.started).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}` : 'no scrape yet');
   setText($('#sNext'), st.running ? 'running…' : st.auto_scrape ? until(st.next_run) : 'off');
   setText($('#sNextSub'), st.auto_scrape ? `every ${st.interval_hours} h` : 'auto-scrape disabled');
   const dot = $('#runDot'), bar = $('#runBar');
   dot.classList.toggle('run', st.running);
   setText($('#runPhase'), st.running ? 'Scraping — ' + st.phase : 'Idle');
   setText($('#runMeta'), st.running ? (st.progress ? `${st.progress} games collected · started by ${st.trigger}` : `started by ${st.trigger}`)
-    : lr ? `last run ${lr.status} ${ago(lr.started)}${lr.error ? ' — ' + lr.error : ''}` : 'waiting for the first scrape');
+    : lr ? `last run: ${lr.status}, ${ago(lr.started)} ago${lr.error ? ' — ' + lr.error : ''}` : 'waiting for the first scrape');
   bar.classList.toggle('indet', st.running && !st.progress);
   const target = S.settings ? S.settings.target_games : 100;
   bar.firstElementChild.style.width = st.running && st.progress ? Math.min(100, st.progress / target * 100) + '%' : (st.running ? '' : '0');

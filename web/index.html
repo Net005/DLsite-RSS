@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23e60026'/%3E%3Cpath d='M9 22a2 2 0 1 0 0 .01M9 15a8 8 0 0 1 8 8M9 9a14 14 0 0 1 14 14' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="app.css">
 </head>
-<body>
+<body translate="no" class="notranslate">
 <header class="top">
   <div class="top-inner">
     <a class="brand" href="#dashboard">
@@ -20,7 +20,7 @@
     </a>
     <div class="topright"><div class="conn" id="conn" title="Live connection"><i></i><span>connecting…</span></div><button class="btn small" id="btnLogout" hidden>Sign out</button></div>
   </div>
-  <nav class="tabs" id="tabs">
+  <nav class="tabs notranslate" id="tabs" translate="no">
     <a href="#dashboard" data-tab="dashboard">Dashboard</a>
     <a href="#ranking" data-tab="ranking">Ranking <em id="tabCount">0</em></a>
     <a href="#log" data-tab="log">Live Log</a>
@@ -32,7 +32,7 @@
 <main>
 <!-- ============ DASHBOARD ============ -->
 <section id="tab-dashboard" class="tab">
-  <div class="statbar">
+  <div class="statbar" translate="no">
     <div class="stat"><label>Tracked games</label><b id="sTotal">–</b><small id="sTotalSub">&nbsp;</small></div>
     <div class="stat accent"><label>New in feed</label><b id="sNew">–</b><small id="sNewSub">&nbsp;</small></div>
     <div class="stat"><label>Last scrape</label><b id="sLast">–</b><small id="sLastSub">&nbsp;</small></div>
@@ -40,7 +40,7 @@
   </div>
 
   <div class="panel runpanel">
-    <div class="runinfo">
+    <div class="runinfo" translate="no">
       <div class="runstate"><span class="dot" id="runDot"></span><b id="runPhase">Idle</b><span id="runMeta" class="muted"></span></div>
       <div class="bar" id="runBar"><i></i></div>
     </div>
